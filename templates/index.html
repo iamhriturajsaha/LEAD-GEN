@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Gen // Contemporary Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #12100e;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.4);
+            --accent-gold: #ffc300;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --base-font: 'Outfit', sans-serif;
+            --serif-font: 'Playfair Display', serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--base-font);
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: hidden; /* Locked for landing */
+        }
+        
+        body.dashboard-active {
+            overflow-y: auto; /* Unlock for dashboard */
+        }
+
+        /* Museum-Grade Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 195, 0, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+
+        .global-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/static/1.png');
+            background-size: cover; background-position: center; z-index: 1;
+        }
+        .map-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 5; opacity: 0.8; pointer-events: none;
+        }
+        .opening-section {
+            position: relative; height: 100vh; width: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; transition: all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+            overflow: hidden;
+        }
+        .opening-section.fade-out { opacity: 0; filter: blur(80px); transform: scale(1.1); }
+        .hero-center-group { display: flex; flex-direction: column; align-items: center; z-index: 50; pointer-events: none; }
+        .hero-logo { font-size: 7vw; font-weight: 800; letter-spacing: -0.02em; pointer-events: none; transition: all 0.8s; }
+        .hero-logo.switching { opacity: 0; filter: blur(20px); }
+        .enter-world-link {
+            position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+            font-size: 1.1rem; font-weight: 800; letter-spacing: 0.6em; text-transform: uppercase;
+            color: #fff; padding: 1.5rem 5rem; border: 1px solid rgba(255,255,255,0.8);
+            cursor: pointer; z-index: 100; pointer-events: auto !important;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .enter-world-link:hover { background: #fff; color: #000; border-color: #fff; letter-spacing: 0.8em; padding: 1.5rem 6rem; }
+        .hero-left-tag, .hero-right-tag {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            font-size: 1.5rem; font-weight: 700; line-height: 1.1; z-index: 30;
+        }
+        .hero-left-tag { left: 4%; text-align: right; width: 200px; }
+        .hero-right-tag { right: 4%; text-align: left; width: 200px; }
+
+        #mainDashboard { position: relative; z-index: 20; min-height: 100vh; background: transparent; }
+        .dashboard-container {
+            width: 100%; max-width: 1100px; margin: 0 auto; padding: 4rem 5%;
+            opacity: 0; filter: blur(30px); transition: all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .dashboard-container.visible { opacity: 1; filter: blur(0); }
+        .dashboard-header { text-align: center; margin-bottom: 5rem; }
+        .dashboard-header .logo { font-size: 1.8rem; font-weight: 800; letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+        .dashboard-header .subtitle { font-size: 0.8rem; color: #ffffff; font-style: italic; }
+        .hero-action-section { text-align: center; margin-bottom: 4rem; }
+        .hero-title { font-family: var(--serif-font); font-size: 3rem; color: var(--accent-gold); font-weight: 700; margin-bottom: 1rem; }
+        .hero-desc { font-size: 1rem; color: #ffffff; margin: 0 auto 3rem; line-height: 1.5; white-space: nowrap; }
+        .action-portal { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+        .solid-white-btn {
+            background: #ffffff; color: #000000; border: none; padding: 1.2rem 4rem;
+            font-size: 0.85rem; font-weight: 800; letter-spacing: 0.2em; cursor: pointer; transition: all 0.4s;
+        }
+        .solid-white-btn:hover { transform: translateY(-3px); }
+        .solid-white-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .export-group { display: flex; gap: 2rem; }
+        .export-link {
+            background: none; border: none; color: var(--text-secondary);
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em; cursor: pointer;
+        }
+        .export-link:hover:not(:disabled) { color: #fff; }
+        .decorative-line { width: 150px; height: 1px; background: var(--border-light); margin: 3rem auto; }
+        .table-container { width: 100%; margin-top: 4rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1rem; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; border-bottom: 1px solid #fff; }
+        td { padding: 1.5rem 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.95rem; }
+        .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 5rem 0; }
+        .sakazuki-loader { width: 60px; height: 60px; border: 1px solid rgba(255,255,255,0.1); border-top: 1px solid var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 2rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .refined-email { color: var(--accent-gold); font-weight: 700; }
+        .email-tag { font-size: 0.55rem; border: 1px solid #fff; padding: 0.15rem 0.4rem; margin-left: 0.8rem; }
+        .hidden { display: none !important; }
+        a.source-link { color: var(--accent-gold); text-decoration: none; }
+        a.source-link:hover { text-decoration: underline; }
+        .back-btn {
+            position: fixed; top: 2rem; left: 2.5rem; z-index: 100;
+            background: none; border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; font-family: var(--base-font); font-size: 0.7rem;
+            font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+            padding: 0.6rem 1.5rem; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .back-btn:hover { background: #fff; color: #000; border-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="global-bg"></div>
+    <canvas id="mapCanvas" class="map-canvas"></canvas>
+
+    <section id="openingPage" class="opening-section">
+        <div class="opening-hero">
+            <div class="hero-left-tag">Unlocking<br>Global Lead<br>Potential</div>
+            <div class="hero-center-group">
+                <div id="languageLogo" class="hero-logo">Lead Gen</div>
+            </div>
+            <div id="enterBtn" class="enter-world-link">Enter World</div>
+            <div class="hero-right-tag">Guided<br>by<br>Advanced AI</div>
+        </div>
+    </section>
+
+    <main id="mainDashboard" class="hidden">
+        <button class="back-btn" onclick="goBack()">← BACK</button>
+        <div class="dashboard-container">
+            <header class="dashboard-header">
+                <div class="logo">LEAD GEN</div>
+                <p class="subtitle">Contemporary intelligence for a refined future.</p>
+            </header>
+            <div class="dashboard-content">
+                <div class="hero-action-section">
+                    <h1 class="hero-title">Cultivate New Leads</h1>
+                    <p class="hero-desc">Sample 100 high-quality startup contacts from our global intelligence core.</p>
+                    <div class="action-portal">
+                        <button id="generateBtn" class="solid-white-btn" onclick="handleGenerate()">BEGIN CULTIVATION</button>
+                        <div class="export-group">
+                            <button id="downloadExcelBtn" class="export-link" disabled onclick="window.location.href='/api/download/excel'">EXPORT EXCEL</button>
+                            <button id="downloadCsvBtn" class="export-link" disabled onclick="window.location.href='/api/download/csv'">EXPORT CSV</button>
+                            <button id="googleSheetsBtn" class="export-link" disabled onclick="syncToSheets()">SYNC SHEETS</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="data-display-section">
+                    <div id="loader" class="loader-container hidden">
+                        <div class="sakazuki-loader"></div>
+                        <p>Refining Leads...</p>
+                    </div>
+                    <div id="emptyState" class="empty-state">
+                        <div class="decorative-line"></div>
+                    </div>
+                    <div id="tableContainer" class="table-container hidden">
+                        <table id="leadsTable">
+                            <thead>
+                                <tr>
+                                    <th>Company</th><th>Contact Name</th><th>Email</th>
+                                    <th>Sector</th><th>Funding</th><th>Location</th><th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    // ====== INLINE SCRIPT — NO CACHING POSSIBLE ======
+
+    // --- Enter World transition ---
+    document.getElementById('enterBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        var op = document.getElementById('openingPage');
+        var dash = document.getElementById('mainDashboard');
+        op.classList.add('fade-out');
+        setTimeout(function() {
+            op.style.display = 'none';
+            dash.classList.remove('hidden');
+            document.body.classList.add('dashboard-active');
+            var container = dash.querySelector('.dashboard-container');
+            if (container) setTimeout(function() { container.classList.add('visible'); }, 50);
+        }, 1200);
+    });
+
+    // --- Back to Home ---
+    function goBack() {
+        var op = document.getElementById('openingPage');
+        var dash = document.getElementById('mainDashboard');
+        var container = dash.querySelector('.dashboard-container');
+        if (container) container.classList.remove('visible');
+        setTimeout(function() {
+            dash.classList.add('hidden');
+            document.body.classList.remove('dashboard-active');
+            op.style.display = '';
+            op.classList.remove('fade-out');
+        }, 500);
+    }
+
+    // --- Sync to Google Sheets ---
+    function syncToSheets() {
+        // First download the CSV
+        window.location.href = '/api/download/csv';
+        // Then open Google Sheets import in a new tab
+        setTimeout(function() {
+            window.open('https://sheets.google.com/create', '_blank');
+            alert('Your CSV has been downloaded. In the Google Sheet that just opened:\n\n1. Go to File → Import\n2. Select the "leads_output.csv" file\n3. Click Import Data\n\nYour leads will sync instantly.');
+        }, 1000);
+    }
+
+    // --- BEGIN CULTIVATION (global function, called via onclick) ---
+    async function handleGenerate() {
+        var btn = document.getElementById('generateBtn');
+        var loader = document.getElementById('loader');
+        var emptyState = document.getElementById('emptyState');
+        var tableContainer = document.getElementById('tableContainer');
+        var leadsBody = document.getElementById('leadsBody');
+
+        btn.disabled = true;
+        btn.innerText = 'REFINING...';
+        if (emptyState) emptyState.classList.add('hidden');
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (loader) loader.classList.remove('hidden');
+
+        try {
+            var response = await fetch('/api/generate');
+            var result = await response.json();
+
+            if (result.status === 'success' && result.data) {
+                // Render table
+                leadsBody.innerHTML = '';
+                result.data.forEach(function(lead, index) {
+                    var tr = document.createElement('tr');
+                    tr.style.opacity = '0';
+                    tr.style.transform = 'translateY(15px)';
+
+                    var emailHtml = lead.Email || '—';
+                    if (emailHtml.indexOf('@') > 0 && emailHtml !== 'no-email@example.com') {
+                        emailHtml = '<span class="refined-email">' + emailHtml + '</span> <span class="email-tag">REFINED</span>';
+                    }
+                    var websiteHtml = lead.Website ? '<a href="' + lead.Website + '" target="_blank" class="source-link">Source</a>' : '—';
+
+                    tr.innerHTML =
+                        '<td><strong>' + (lead['Company Name'] || '—') + '</strong></td>' +
+                        '<td>' + (lead['Contact Name'] || '—') + '</td>' +
+                        '<td>' + emailHtml + '</td>' +
+                        '<td>' + (lead.Category || '—') + '</td>' +
+                        '<td style="color:#ffc300">' + (lead['Funding (USD)'] || '—') + '</td>' +
+                        '<td>' + (lead.Location || '—') + '</td>' +
+                        '<td>' + websiteHtml + '</td>';
+
+                    leadsBody.appendChild(tr);
+                    setTimeout(function() {
+                        tr.style.transition = 'all 0.6s ease-out';
+                        tr.style.opacity = '1';
+                        tr.style.transform = 'translateY(0)';
+                    }, index * 20);
+                });
+
+                if (loader) loader.classList.add('hidden');
+                if (tableContainer) tableContainer.classList.remove('hidden');
+                document.getElementById('downloadExcelBtn').disabled = false;
+                document.getElementById('downloadCsvBtn').disabled = false;
+                document.getElementById('googleSheetsBtn').disabled = false;
+            } else {
+                if (loader) loader.classList.add('hidden');
+                if (emptyState) emptyState.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            if (loader) loader.classList.add('hidden');
+            if (emptyState) emptyState.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'BEGIN CULTIVATION';
+        }
+    }
+
+    // --- Language cycling ---
+    var languages = ["Lead Gen", "自動リード", "自动线索", "자동 리드", "Leads Auto", "Auto-Leads", "Авто-лиды"];
+    var langIdx = 0;
+    var langActive = true;
+    function cycleLang() {
+        if (!langActive) return;
+        var el = document.getElementById('languageLogo');
+        if (!el) return;
+        el.classList.add('switching');
+        setTimeout(function() {
+            el.innerText = languages[langIdx];
+            el.classList.remove('switching');
+            langIdx = (langIdx + 1) % languages.length;
+            setTimeout(cycleLang, 3000);
+        }, 500);
+    }
+    cycleLang();
+
+    // --- Premium 3D Globe ---
+    (function() {
+        var canvas = document.getElementById('mapCanvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        var rot = 0, SPEED = 0.0015, TILT = 0.41, frame = 0;
+
+        var stars = [];
+        for (var i = 0; i < 200; i++) stars.push({x:Math.random(),y:Math.random(),s:Math.random()*1.5+0.3,b:Math.random()});
+
+        var conts = [
+            [[72,-168],[65,-168],[60,-140],[55,-130],[48,-125],[40,-124],[32,-117],[25,-110],[20,-105],[15,-92],[18,-88],[21,-87],[25,-80],[30,-82],[35,-75],[40,-74],[42,-70],[45,-67],[47,-60],[50,-57],[55,-60],[58,-65],[60,-65],[62,-75],[60,-80],[55,-85],[50,-95],[55,-100],[58,-110],[60,-120],[65,-140],[72,-168]],
+            [[12,-72],[10,-76],[4,-77],[0,-80],[-5,-81],[-6,-77],[-15,-75],[-18,-70],[-23,-70],[-28,-65],[-35,-57],[-40,-62],[-50,-70],[-55,-68],[-55,-64],[-52,-60],[-42,-63],[-38,-56],[-33,-52],[-28,-48],[-23,-43],[-15,-39],[-10,-37],[-5,-35],[0,-50],[5,-60],[10,-72],[12,-72]],
+            [[36,-10],[38,-8],[43,-2],[46,1],[48,0],[52,0],[55,8],[57,10],[60,5],[65,12],[70,20],[70,28],[65,28],[60,30],[55,20],[52,8],[50,4],[48,7],[45,13],[42,15],[38,22],[36,28],[37,22],[38,12],[36,-10]],
+            [[35,-5],[37,10],[33,10],[30,32],[25,35],[20,38],[15,42],[12,44],[5,42],[0,42],[-10,40],[-15,35],[-25,33],[-34,26],[-35,20],[-33,18],[-20,12],[-10,14],[-5,10],[0,10],[5,-5],[10,-15],[20,-17],[25,-15],[30,-10],[35,-5]],
+            [[42,28],[45,35],[42,45],[38,55],[30,50],[25,55],[20,60],[25,65],[35,70],[38,75],[30,80],[20,73],[15,75],[8,80],[0,105],[5,105],[15,108],[20,110],[25,120],[30,122],[35,130],[45,135],[55,140],[65,140],[70,130],[65,120],[60,100],[55,80],[50,70],[55,65],[55,55],[50,50],[45,40],[42,28]],
+            [[-15,130],[-12,135],[-12,142],[-17,146],[-25,153],[-33,152],[-38,145],[-35,137],[-32,127],[-25,114],[-20,118],[-15,125],[-15,130]],
+            [[60,-45],[65,-55],[75,-58],[80,-55],[82,-35],[80,-20],[75,-20],[70,-25],[65,-35],[60,-45]],
+            [[31,131],[35,133],[38,139],[42,141],[45,142],[43,145],[39,140],[35,135],[31,131]]
+        ];
+
+        function toR(d){return d*Math.PI/180;}
+        var cities=[
+            {lat:toR(37.7),lng:toR(-122.4)},{lat:toR(40.7),lng:toR(-74)},
+            {lat:toR(51.5),lng:toR(-0.1)},{lat:toR(48.8),lng:toR(2.3)},
+            {lat:toR(25.2),lng:toR(55.3)},{lat:toR(19),lng:toR(72.8)},
+            {lat:toR(31.2),lng:toR(121.5)},{lat:toR(35.7),lng:toR(139.7)},
+            {lat:toR(-33.9),lng:toR(151.2)},{lat:toR(-23.5),lng:toR(-46.6)}
+        ];
+        var arcs=[];
+        [[0,1],[1,2],[2,4],[4,5],[5,6],[6,7],[7,8],[3,5],[0,9],[9,2],[8,0],[2,6],[1,4],[3,7],[5,9]].forEach(function(p){
+            arcs.push({f:p[0],t:p[1],p:Math.random(),s:0.003+Math.random()*0.005});
+        });
+
+        function proj(lat,lng,cx,cy,r){
+            var x=Math.cos(lat)*Math.sin(lng+rot);
+            var y=Math.sin(lat)*Math.cos(TILT)-Math.cos(lat)*Math.cos(lng+rot)*Math.sin(TILT);
+            var z=Math.sin(lat)*Math.sin(TILT)+Math.cos(lat)*Math.cos(lng+rot)*Math.cos(TILT);
+            return{x:cx+x*r,y:cy-y*r,z:z,v:z>-0.05};
+        }
+        function sl(a1,b1,a2,b2,t){
+            var d=Math.acos(Math.min(1,Math.max(-1,Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(b2-b1))));
+            if(d<0.001)return{lat:a1,lng:b1};
+            var a=Math.sin((1-t)*d)/Math.sin(d),b=Math.sin(t*d)/Math.sin(d);
+            var x=a*Math.cos(a1)*Math.cos(b1)+b*Math.cos(a2)*Math.cos(b2);
+            var y=a*Math.cos(a1)*Math.sin(b1)+b*Math.cos(a2)*Math.sin(b2);
+            var z=a*Math.sin(a1)+b*Math.sin(a2);
+            return{lat:Math.atan2(z,Math.sqrt(x*x+y*y)),lng:Math.atan2(y,x)};
+        }
+
+        function draw(){
+            var W=canvas.width,H=canvas.height;
+            ctx.clearRect(0,0,W,H);
+            var cx=W*0.5,cy=H*0.5,R=Math.min(W,H)*0.3;
+            rot+=SPEED; frame++;
+
+            // Stars
+            stars.forEach(function(s){
+                var f=0.5+0.5*Math.sin(frame*0.02+s.b*10);
+                ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.s,0,Math.PI*2);
+                ctx.fillStyle='rgba(255,255,255,'+(f*0.35)+')';ctx.fill();
+            });
+
+            // Atmosphere halo
+            var g=ctx.createRadialGradient(cx,cy,R*0.85,cx,cy,R*1.4);
+            g.addColorStop(0,'rgba(30,80,180,0)');
+            g.addColorStop(0.4,'rgba(30,80,180,0.04)');
+            g.addColorStop(0.7,'rgba(30,120,255,0.02)');
+            g.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+            // Globe body (dark ocean)
+            var bg=ctx.createRadialGradient(cx-R*0.25,cy-R*0.25,R*0.05,cx,cy,R);
+            bg.addColorStop(0,'rgba(15,40,70,0.9)');
+            bg.addColorStop(0.5,'rgba(8,22,45,0.92)');
+            bg.addColorStop(1,'rgba(3,8,18,0.95)');
+            ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+
+            // Ocean specular
+            var sp=ctx.createRadialGradient(cx-R*0.3,cy-R*0.35,R*0.02,cx-R*0.1,cy-R*0.15,R*0.5);
+            sp.addColorStop(0,'rgba(60,140,220,0.1)');sp.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=sp;ctx.fillRect(cx-R,cy-R,R*2,R*2);
+
+            // Rim
+            ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+            ctx.strokeStyle='rgba(60,140,220,0.18)';ctx.lineWidth=1.5;ctx.stroke();
+
+            // Grid (very subtle)
+            [-45,0,45].forEach(function(lat){
+                ctx.beginPath();var s=false;
+                for(var lng=0;lng<=360;lng+=5){var p=proj(toR(lat),toR(lng-180),cx,cy,R);
+                if(p.v){if(!s){ctx.moveTo(p.x,p.y);s=true;}else ctx.lineTo(p.x,p.y);}else s=false;}
+                ctx.strokeStyle='rgba(60,140,220,0.06)';ctx.lineWidth=0.3;ctx.stroke();
+            });
+
+            // Continents (filled green with bright edges)
+            conts.forEach(function(c){
+                ctx.beginPath();var s=false,lv=false;
+                for(var i=0;i<c.length;i++){
+                    var p=proj(toR(c[i][0]),toR(c[i][1]),cx,cy,R);
+                    if(p.v){if(!s||!lv){ctx.moveTo(p.x,p.y);s=true;}else ctx.lineTo(p.x,p.y);lv=true;}else lv=false;
+                }
+                ctx.closePath();
+                ctx.fillStyle='rgba(30,140,60,0.15)';ctx.fill();
+                ctx.strokeStyle='rgba(60,200,100,0.4)';ctx.lineWidth=1;ctx.stroke();
+                // Edge dots
+                for(var i=0;i<c.length;i++){
+                    var p=proj(toR(c[i][0]),toR(c[i][1]),cx,cy,R);
+                    if(p.v){var br=0.3+p.z*0.5;ctx.beginPath();ctx.arc(p.x,p.y,1.2,0,Math.PI*2);
+                    ctx.fillStyle='rgba(60,200,100,'+br+')';ctx.fill();}
+                }
+            });
+
+            // Data arcs
+            arcs.forEach(function(a){
+                var c1=cities[a.f],c2=cities[a.t];
+                ctx.beginPath();var pv=false;
+                for(var t=0;t<=1;t+=0.015){
+                    var m=sl(c1.lat,c1.lng,c2.lat,c2.lng,t);
+                    var l=1+0.12*Math.sin(t*Math.PI);
+                    var p=proj(m.lat,m.lng,cx,cy,R*l);
+                    if(p.v){if(!pv)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);pv=true;}else pv=false;
+                }
+                ctx.strokeStyle='rgba(255,195,0,0.3)';ctx.lineWidth=1.2;ctx.stroke();
+                // Pulse
+                a.p+=a.s;if(a.p>1)a.p=0;
+                var pm=sl(c1.lat,c1.lng,c2.lat,c2.lng,a.p);
+                var pp=proj(pm.lat,pm.lng,cx,cy,R*(1+0.12*Math.sin(a.p*Math.PI)));
+                if(pp.v){ctx.beginPath();ctx.arc(pp.x,pp.y,3,0,Math.PI*2);
+                ctx.fillStyle='#fff';ctx.shadowBlur=14;ctx.shadowColor='#ffc300';ctx.fill();ctx.shadowBlur=0;}
+            });
+
+            // City nodes with pulse
+            cities.forEach(function(c){
+                var p=proj(c.lat,c.lng,cx,cy,R);
+                if(p.v){
+                    var pulse=4+Math.sin(frame*0.05)*2;
+                    ctx.beginPath();ctx.arc(p.x,p.y,pulse,0,Math.PI*2);
+                    ctx.strokeStyle='rgba(255,195,0,0.15)';ctx.lineWidth=0.5;ctx.stroke();
+                    ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+                    ctx.fillStyle='#ffc300';ctx.shadowBlur=8;ctx.shadowColor='#ffc300';ctx.fill();ctx.shadowBlur=0;
+                }
+            });
+
+            // Final atmosphere rim
+            var rim=ctx.createRadialGradient(cx,cy,R*0.95,cx,cy,R*1.08);
+            rim.addColorStop(0,'rgba(60,140,255,0)');
+            rim.addColorStop(0.5,'rgba(60,140,255,0.07)');
+            rim.addColorStop(1,'rgba(60,140,255,0)');
+            ctx.beginPath();ctx.arc(cx,cy,R*1.08,0,Math.PI*2);ctx.fillStyle=rim;ctx.fill();
+
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+    </script>
+</body>
+</html>
