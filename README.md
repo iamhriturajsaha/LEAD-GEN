@@ -3,6 +3,13 @@
 ## ✧ Overview
 Lead Gen is a sophisticated data cultivation engine designed to bridge the gap between raw global datasets and actionable business intelligence. It automates the extraction, enrichment and organization of lead data, transforming static CSV records into high-fidelity contacts through intelligent API integration and heuristic synthesis.
 
+## ✧ Quick Glance
+<p align="center">
+  <img src="Images/1.png" alt="1" width="1000"/><br>
+  <img src="Images/2.png" alt="2" width="1000"/><br>
+  <img src="Images/3.png" alt="3" width="1000"/><br>
+</p>
+
 The project features a cinematic, glassmorphic dashboard with a custom-engineered 3D coordinate-projected globe, providing a premium visual interface for modern data operations.
 
 ## ✧ Key Pillars
